@@ -20,9 +20,10 @@ DataBaseImpl::~DataBaseImpl()
     CoUninitialize();
 }
 
-int DataBaseImpl::initDataBase(const std::string& ip, const std::string& dataBaseName)
+BOOL DataBaseImpl::initDataBase(const std::string& ip, const std::string& dataBaseName)
 {
     dataBaseName_ = dataBaseName;
+    dataBaseIp_ = ip;
     HRESULT result =  CoInitialize(NULL);
     if (result != S_OK) {
         return FALSE;
@@ -41,17 +42,16 @@ int DataBaseImpl::initDataBase(const std::string& ip, const std::string& dataBas
     return TRUE;
 }
 
-void cwy::DataBaseImpl::selectSql(const std::string& sqlRequest, std::vector<std::vector<std::string>>& result)
+void DataBaseImpl::selectSql(const std::string& sqlRequest, std::vector<std::vector<std::string>>& result)
 {
     try
     {
         pRecordset = pMyConnect->Execute(sqlRequest.c_str(), NULL, adCmdText);
-        long recordCount = pRecordset->GetRecordCount();
-        for (long i = 0; i < recordCount; ++i) {
+        while (!pRecordset->adoEOF) {
             long fieldCount = pRecordset->GetFields()->Count;
             std::vector<std::string> fieldRecord;
             for (long j = 0; j < fieldCount; ++j) {
-                _variant_t tmp = pRecordset->GetFields()->GetItem((long)1)->GetValue();
+                _variant_t tmp = pRecordset->GetFields()->GetItem((long)j)->GetValue();
                 fieldRecord.emplace_back((std::string)(_bstr_t)&tmp);
             }
             result.emplace_back(fieldRecord);
@@ -62,6 +62,19 @@ void cwy::DataBaseImpl::selectSql(const std::string& sqlRequest, std::vector<std
     {
         return;
     }
+}
+
+BOOL DataBaseImpl::insertSql(const std::string& sqlRequest)
+{
+    try
+    {
+        pRecordset = pMyConnect->Execute(sqlRequest.c_str(), NULL, adCmdText);
+    }
+    catch (_com_error e)
+    {
+        return FALSE;
+    }
+    return TRUE;
 }
 
 void DataBaseImpl::GetId()

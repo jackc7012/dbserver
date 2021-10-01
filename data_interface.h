@@ -15,9 +15,13 @@ namespace cwy {
 
         ~DataBaseImpl();
 
-        int initDataBase(const std::string& ip, const std::string& dataBaseName);
+        BOOL initDataBase(const std::string& ip, const std::string& dataBaseName);
 
         void selectSql(const std::string& sqlRequest, std::vector<std::vector<std::string>>& result);
+
+        BOOL insertSql(const std::string& sqlRequest);
+
+
 
         void GetId();
 
@@ -27,8 +31,12 @@ namespace cwy {
 
         long long InsertRegister(const std::string& registerName, const char* password, const std::string ip);
         
-        std::string getName() const {
+        std::string getDbName() const {
             return dataBaseName_;
+        }
+
+        std::string getServerIp() const {
+            return dataBaseIp_;
         }
 
     private:
@@ -41,6 +49,7 @@ namespace cwy {
         _ConnectionPtr pMyConnect{ nullptr };
         _RecordsetPtr pRecordset{ nullptr };
         std::string dataBaseName_;
+        std::string dataBaseIp_;
     };
 }
 

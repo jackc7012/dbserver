@@ -21,9 +21,15 @@ extern "C" {
 
         BOOL initSqlDataBase(const std::string& ip, const std::string& dataBaseName);
 
-        std::string getName();
+        std::string getDbName() const;
+
+        std::string getServerIp() const;
 
         std::vector<std::vector<std::string>> selectDbInfo(const std::string& sqlRequest);
+
+        BOOL insertDbInfo(const std::string& sqlRequest);
+
+        BOOL updateDbInfo(const std::string& sqlRequest);
     };
 }
 

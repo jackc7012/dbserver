@@ -18,9 +18,14 @@ BOOL DataBase::initSqlDataBase(const std::string& ip, const std::string& dataBas
     return DataBaseImpl::createInstance()->initDataBase(ip, dataBaseName);
 }
 
-std::string DataBase::getName()
+std::string DataBase::getDbName() const
 {
-    return DataBaseImpl::createInstance()->getName();
+    return DataBaseImpl::createInstance()->getDbName();
+}
+
+std::string DataBase::getServerIp() const
+{
+    return DataBaseImpl::createInstance()->getServerIp();
 }
 
 std::vector<std::vector<std::string>> DataBase::selectDbInfo(const std::string& sqlRequest)
@@ -28,6 +33,16 @@ std::vector<std::vector<std::string>> DataBase::selectDbInfo(const std::string& 
     std::vector<std::vector<std::string>> result;
     DataBaseImpl::createInstance()->selectSql(sqlRequest, result);
     return result;
+}
+
+BOOL DataBase::insertDbInfo(const std::string& sqlRequest)
+{
+    return 0;
+}
+
+BOOL DataBase::updateDbInfo(const std::string& sqlRequest)
+{
+    return 0;
 }
 
 
