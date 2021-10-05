@@ -7,6 +7,13 @@
 
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF", "adoEOF")
 
+enum class DBTYPE {
+    INSERT,
+    DEL,
+    MODIFY,
+    SEARCH
+};
+
 namespace cwy {
     class DataBaseImpl
     {
@@ -17,20 +24,10 @@ namespace cwy {
 
         BOOL initDataBase(const std::string& ip, const std::string& dataBaseName);
 
+        BOOL operSql(const DBTYPE dbType, const std::string& sqlRequest);
+
         void selectSql(const std::string& sqlRequest, std::vector<std::vector<std::string>>& result);
 
-        BOOL insertSql(const std::string& sqlRequest);
-
-
-
-        void GetId();
-
-        int SearchDataBaseLogin(const long long loginID, std::string& name, std::string& ip, char* password, int& loginStatus);
-
-        int UpdateLoginStatus(const int type = 0, const long long loginID = -1);
-
-        long long InsertRegister(const std::string& registerName, const char* password, const std::string ip);
-        
         std::string getDbName() const {
             return dataBaseName_;
         }
@@ -40,10 +37,15 @@ namespace cwy {
         }
 
     private:
+        BOOL judgeCommand(const DBTYPE dbType, const std::string& command);
+
+    private:
         DataBaseImpl();
 
         DataBaseImpl(const DataBaseImpl&) = delete;
+        DataBaseImpl(const DataBaseImpl&&) = delete;
         DataBaseImpl operator=(const DataBaseImpl&) = delete;
+        DataBaseImpl operator=(const DataBaseImpl&&) = delete;
 
     private:
         _ConnectionPtr pMyConnect{ nullptr };

@@ -6,7 +6,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
                        LPVOID lpReserved
                      )
 {
-    hModule, ul_reason_for_call, lpReserved;
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:

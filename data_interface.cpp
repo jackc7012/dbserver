@@ -42,6 +42,22 @@ BOOL DataBaseImpl::initDataBase(const std::string& ip, const std::string& dataBa
     return TRUE;
 }
 
+BOOL DataBaseImpl::operSql(const DBTYPE dbType, const std::string& sqlRequest)
+{
+    try
+    {
+        if (!judgeCommand(dbType, sqlRequest)) {
+            return FALSE;
+        }
+        pRecordset = pMyConnect->Execute(sqlRequest.c_str(), NULL, adCmdText);
+    }
+    catch (_com_error e)
+    {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 void DataBaseImpl::selectSql(const std::string& sqlRequest, std::vector<std::vector<std::string>>& result)
 {
     try
@@ -64,107 +80,38 @@ void DataBaseImpl::selectSql(const std::string& sqlRequest, std::vector<std::vec
     }
 }
 
-BOOL DataBaseImpl::insertSql(const std::string& sqlRequest)
+BOOL DataBaseImpl::judgeCommand(const DBTYPE dbType, const std::string& command)
 {
-    try
-    {
-        pRecordset = pMyConnect->Execute(sqlRequest.c_str(), NULL, adCmdText);
+    switch (dbType) {
+    case DBTYPE::MODIFY: {
+        if (command.substr(0, command.find_first_of(' ')) == "update") {
+            return TRUE;
+        }
+        else {
+            return FALSE;
+        }
+        break;
     }
-    catch (_com_error e)
-    {
+    case DBTYPE::INSERT: {
+        if (command.substr(0, command.find_first_of(' ')) == "insert") {
+            return TRUE;
+        }
+        else {
+            return FALSE;
+        }
+        break;
+    }
+    case DBTYPE::DEL: {
+        if (command.substr(0, command.find_first_of(' ')) == "delete") {
+            return TRUE;
+        }
+        else {
+            return FALSE;
+        }
+        break;
+    }
+    default:
         return FALSE;
     }
-    return TRUE;
-}
-
-void DataBaseImpl::GetId()
-{
-    /*char sql[100] = { 0 };
-    sprintf_s(sql, 100, "select ID from tb_info order by ID desc");
-    try
-    {
-        pRecordset = pMyConnect->Execute(sql, NULL, adCmdText);
-        _variant_t id = pRecordset->GetFields()->GetItem((long)0)->GetValue();
-        presentId = atoll(((std::string)(_bstr_t)&id).c_str());
-    }
-    catch (_com_error e)
-    {
-        logDataBase << "GetId failed descripton :" << (std::string)e.Description();
-        logDataBase.PrintlogError(FILE_FORMAT);
-    }*/
-    return ;
-}
-
-int DataBaseImpl::SearchDataBaseLogin(const long long loginID, std::string& name, std::string& ip, char* password, int& loginStatus)
-{
-    /*int result = 0;
-    char sql[100] = { 0 };
-    sprintf_s(sql, 100, "select Name, Password, Ip, IsLogin from tb_info where ID = %lld", loginID);
-    try
-    {
-        logDataBase << "sql :" << sql;
-        logDataBase.PrintlogDebug(FILE_FORMAT);
-        pRecordset = pMyConnect->Execute(sql, NULL, adCmdText);
-        _variant_t sqlName = pRecordset->GetFields()->GetItem((long)0)->GetValue();
-        _variant_t sqlPassword = pRecordset->GetFields()->GetItem((long)1)->GetValue();
-        _variant_t sqlIp = pRecordset->GetFields()->GetItem((long)2)->GetValue();
-        _variant_t sqlIsLogin = pRecordset->GetFields()->GetItem((long)3)->GetValue();
-        memcpy_s(password, 50, (char*)(_bstr_t)&sqlPassword, strlen((_bstr_t)&sqlPassword) + 1);
-        name = (std::string)(_bstr_t)&sqlName;
-        ip = (std::string)(_bstr_t)&sqlIp;
-        loginStatus = atoi(((std::string)(_bstr_t)&sqlIsLogin).c_str());
-    }
-    catch (_com_error e)
-    {
-        logDataBase << "SearchDataBaseLogin failed descripton :" << (std::string)e.Description();
-        logDataBase.PrintlogError(FILE_FORMAT);
-        result = -1;
-    }*/
-    return 0;
-}
-
-int DataBaseImpl::UpdateLoginStatus(const int type/* = 0*/, const long long loginID/* = -1*/)
-{
-    /*int result = 0;
-    char sql[100] = { 0 };
-    if (loginID == -1) {
-        sprintf_s(sql, 100, "update tb_info set IsLogin = %d ", type);
-    }
-    else {
-        sprintf_s(sql, 100, "update tb_info set IsLogin = %d where ID = %lld", type, loginID);
-    }
-    try
-    {
-        logDataBase << "sql :" << sql;
-        logDataBase.PrintlogDebug(FILE_FORMAT);
-        pRecordset = pMyConnect->Execute(sql, NULL, adCmdText);
-    }
-    catch (_com_error e)
-    {
-        logDataBase << "UpdateLoginStatus " << type << " failed descripton :" << (std::string)e.Description();
-        logDataBase.PrintlogError(FILE_FORMAT);
-        result = -1;
-    }*/
-    return 0;
-}
-
-long long DataBaseImpl::InsertRegister(const std::string& registerName, const char* password, const std::string ip)
-{
-    /*long long result = 0;
-    char sql[100] = { 0 };
-    sprintf_s(sql, 100, "insert into tb_info values(%lld, '%s', '%s', '%s', 0)", ++presentId, registerName.c_str(), password, ip.c_str());
-    try
-    {
-        logDataBase << "sql :" << sql;
-        logDataBase.PrintlogDebug(FILE_FORMAT);
-        pRecordset = pMyConnect->Execute(sql, NULL, adCmdText);
-        result = presentId;
-    }
-    catch (_com_error e)
-    {
-        logDataBase << "InsertRegister failed descripton :" << (std::string)e.Description();
-        logDataBase.PrintlogError(FILE_FORMAT);
-        result = -1;
-    }*/
-    return 0;
+    return FALSE;
 }
