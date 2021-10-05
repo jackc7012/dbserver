@@ -1,2 +1,0 @@
-E:\my_code\SQLReader\Debug\SQLReader.dll
-E:\my_code\SQLReader\Debug\SQLReader.pdb
