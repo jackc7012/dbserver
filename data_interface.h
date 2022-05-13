@@ -42,9 +42,9 @@ namespace cwy {
     private:
         DataBaseImpl();
 
-        DataBaseImpl(const DataBaseImpl&) = delete;
-        DataBaseImpl(const DataBaseImpl&&) = delete;
-        DataBaseImpl operator=(const DataBaseImpl&) = delete;
+        DataBaseImpl(const DataBaseImpl&)            = delete;
+        DataBaseImpl(const DataBaseImpl&&)           = delete;
+        DataBaseImpl operator=(const DataBaseImpl&)  = delete;
         DataBaseImpl operator=(const DataBaseImpl&&) = delete;
 
     private:

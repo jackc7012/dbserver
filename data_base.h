@@ -34,6 +34,7 @@ public:
     SqlRequest& operator <<(const std::string& sqlRequest);
     SqlRequest& operator <<(const long long sqlRequest);
 
+    void clear();
     std::string str() const;
 
 private:

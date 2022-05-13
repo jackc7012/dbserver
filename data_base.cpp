@@ -4,8 +4,6 @@
 #include "data_interface.h"
 using namespace cwy;
 
-#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF", "adoEOF")
-
 DataBase::DataBase()
 {
 }
@@ -58,6 +56,7 @@ SqlRequest::SqlRequest(const std::string& str)
 
 SqlRequest::SqlRequest()
 {
+    str_.str("");
 }
 
 SqlRequest::~SqlRequest()
@@ -67,10 +66,8 @@ SqlRequest::~SqlRequest()
 
 SqlRequest& SqlRequest::operator<<(const std::string& sqlRequest)
 {
-    std::string tmp(sqlRequest);
-    trim(tmp);
-    if (checkSqlValid(tmp)) {
-        str_ << tmp;
+    if (checkSqlValid(sqlRequest)) {
+        str_ << sqlRequest;
     }
     else {
         errType_ = ERRTYPE::COMMANDINJECTION;
@@ -81,7 +78,6 @@ SqlRequest& SqlRequest::operator<<(const std::string& sqlRequest)
 SqlRequest& SqlRequest::operator<<(const long long sqlRequest)
 {
     std::string tmp = std::to_string(sqlRequest);
-    trim(tmp);
     if (checkSqlValid(tmp)) {
         str_ << tmp;
     }
@@ -89,6 +85,11 @@ SqlRequest& SqlRequest::operator<<(const long long sqlRequest)
         errType_ = ERRTYPE::COMMANDINJECTION;
     }
     return *this;
+}
+
+void SqlRequest::clear()
+{
+    str_.str("");
 }
 
 std::string SqlRequest::str() const
