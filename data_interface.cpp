@@ -2,28 +2,24 @@
 using namespace cwy;
 
 DataBaseImpl::DataBaseImpl()
-{
-    
+{ 
 }
 
 DataBaseImpl* DataBaseImpl::createInstance()
 {
-    static DataBaseImpl* ptr = nullptr;
-    if (ptr == nullptr) {
-        ptr = new DataBaseImpl();
-    }
-    return ptr;
+    static DataBaseImpl ptr;
+    return &ptr;
 }
 
 DataBaseImpl::~DataBaseImpl()
 {
-    CoUninitialize();
 }
 
-BOOL DataBaseImpl::initDataBase(const std::string& ip, const std::string& dataBaseName)
+BOOL DataBaseImpl::initDataBase(const std::string& ip, const std::string& dataBaseName, const std::string& uid, const std::string& pwd)
 {
     dataBaseName_ = dataBaseName;
     dataBaseIp_ = ip;
+    dataBaseUid_ = uid;
     HRESULT result =  CoInitialize(NULL);
     if (result != S_OK) {
         return FALSE;
@@ -35,8 +31,22 @@ BOOL DataBaseImpl::initDataBase(const std::string& ip, const std::string& dataBa
         return FALSE;
     }
     char connectionString[100] = { 0 };
-    sprintf_s(connectionString, 100, "Driver={sql server};server=%s;uid=sa;pwd=chen931125;database=%s;", ip.c_str(), dataBaseName.c_str());
+    sprintf_s(connectionString, 100, "Driver={sql server};server=%s;uid=%s;pwd=%s;database=%s;"
+        , ip.c_str(), uid.c_str(), pwd.c_str(), dataBaseName.c_str());
     if (pMyConnect->Open(connectionString, "", "", adModeUnknown) != 0) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL DataBaseImpl::uninitDataBase()
+{
+    try {
+        pMyConnect->Close();
+        pMyConnect.Release();
+        CoUninitialize();
+    }
+    catch (_com_error e) {
         return FALSE;
     }
     return TRUE;
@@ -62,6 +72,9 @@ void DataBaseImpl::selectSql(const std::string& sqlRequest, std::vector<std::vec
 {
     try
     {
+        if (!judgeCommand(DBTYPE::SEARCH, sqlRequest)) {
+            return;
+        }
         pRecordset = pMyConnect->Execute(sqlRequest.c_str(), NULL, adCmdText);
         while (!pRecordset->adoEOF) {
             long fieldCount = pRecordset->GetFields()->Count;
@@ -103,6 +116,15 @@ BOOL DataBaseImpl::judgeCommand(const DBTYPE dbType, const std::string& command)
     }
     case DBTYPE::DEL: {
         if (command.substr(0, command.find_first_of(' ')) == "delete") {
+            return TRUE;
+        }
+        else {
+            return FALSE;
+        }
+        break;
+    }
+    case DBTYPE::SEARCH: {
+        if (command.substr(0, command.find_first_of(' ')) == "select") {
             return TRUE;
         }
         else {

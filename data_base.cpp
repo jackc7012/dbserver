@@ -12,9 +12,9 @@ DataBase::~DataBase()
 {
 }
 
-BOOL DataBase::initSqlDataBase(const std::string& ip, const std::string& dataBaseName)
+BOOL DataBase::initSqlDataBase(const std::string& ip, const std::string& dataBaseName, const std::string& uid, const std::string& pwd)
 {
-    return DataBaseImpl::createInstance()->initDataBase(ip, dataBaseName);
+    return DataBaseImpl::createInstance()->initDataBase(ip, dataBaseName, uid, pwd);
 }
 
 std::string DataBase::getDbName() const
@@ -25,6 +25,11 @@ std::string DataBase::getDbName() const
 std::string DataBase::getServerIp() const
 {
     return DataBaseImpl::createInstance()->getServerIp();
+}
+
+std::string DataBase::getDbUid() const
+{
+    return DataBaseImpl::createInstance()->getDbUid();
 }
 
 std::vector<std::vector<std::string>> DataBase::selectDbInfo(const SqlRequest& sqlRequest)
@@ -47,6 +52,11 @@ BOOL DataBase::updateDbInfo(const SqlRequest& sqlRequest)
 BOOL DataBase::delDbInfo(const SqlRequest& sqlRequest)
 {
     return DataBaseImpl::createInstance()->operSql(DBTYPE::DEL, sqlRequest.str());
+}
+
+BOOL DataBase::uninitDataBase()
+{
+    return DataBaseImpl::createInstance()->uninitDataBase();
 }
 
 SqlRequest::SqlRequest(const std::string& str)
@@ -108,25 +118,26 @@ std::string DLL_API toDbString(const std::string& src)
 
 std::string DLL_API dbJoin(const std::vector<long long>& srcList)
 {
-    std::ostringstream result('(');
+    std::string result("(");
     for (const auto& srcStr : srcList) {
         std::string src = std::to_string(srcStr);
         if (checkValid(src)) {
-            result << src << ", ";
+            result += "'" + src + "', ";
         }
     }
-    result << ")";
-    return result.str();
+    result += ")";
+    return result;
 }
 
 std::string DLL_API dbJoin(const std::vector<std::string>& srcList)
 {
-    std::ostringstream result('(');
+    std::string result("(");
     for (const auto& src : srcList) {
         if (checkValid(src)) {
-            result << "'" << src << "', ";
+            result += "'" + src + "', ";
         }
     }
-    result << ")";
-    return result.str();
+    result = result.substr(0, result.length() - 2);
+    result += ")";
+    return result;
 }

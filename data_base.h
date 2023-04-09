@@ -27,9 +27,9 @@ public:
     SqlRequest();
     ~SqlRequest();
     SqlRequest(const SqlRequest&)               = delete;
-    SqlRequest(const SqlRequest&&)              = delete;
+    SqlRequest(SqlRequest&&)                    = delete;
     SqlRequest& operator = (const SqlRequest&)  = delete;
-    SqlRequest& operator = (const SqlRequest&&) = delete;
+    SqlRequest& operator = (SqlRequest&&)       = delete;
 
     SqlRequest& operator <<(const std::string& sqlRequest);
     SqlRequest& operator <<(const long long sqlRequest);
@@ -54,17 +54,19 @@ public:
     DataBase();
     ~DataBase();
 
-    DataBase(const DataBase &)               = delete;
-    DataBase(const DataBase &&)              = delete;
-    DataBase& operator = (const DataBase &)  = delete;
-    DataBase& operator = (const DataBase &&) = delete;
+    DataBase(const DataBase &)                  = delete;
+    DataBase(DataBase &&)                       = delete;
+    DataBase& operator = (const DataBase &)     = delete;
+    DataBase& operator = (DataBase &&)          = delete;
 
     /* 数据库初始化
         * ip:数据库服务器ip
         * dataBaseName:数据库名
+        * uid:数据库登录用户名
+        * pwd:数据库登录密码
         * return 连接成功与否
         */
-    BOOL initSqlDataBase(const std::string& ip, const std::string& dataBaseName);
+    BOOL initSqlDataBase(const std::string& ip, const std::string& dataBaseName, const std::string& uid, const std::string& pwd);
 
     /* 获取数据库名
         * return 数据库名
@@ -75,6 +77,11 @@ public:
         * return 服务器ip
         */
     std::string getServerIp() const;
+
+    /* 获取数据库登录用户名
+        * return 服务器登录用户名
+        */
+    std::string getDbUid() const;
 
     /* 查询数据库数据
         * sqlRequest sql请求
@@ -99,6 +106,12 @@ public:
         * return 删除成功与否
         */
     BOOL delDbInfo(const SqlRequest& sqlRequest);
+
+    /* 删除数据库数据
+        * sqlRequest sql请求
+        * return 删除成功与否
+        */
+    BOOL uninitDataBase();
 };
 
 #endif // !MY_DATA_BASE_H
