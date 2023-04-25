@@ -14,28 +14,31 @@
 #include <windows.h>
 #include <vector>
 
-enum class DLL_API ERRTYPE
-{
+typedef std::vector<std::string> DataRecordLine;
+typedef std::vector<DataRecordLine> DataRecords;
+
+enum class DLL_API ERRTYPE {
     OK,
     COMMANDINJECTION
 };
 
-class DLL_API SqlRequest
-{
+class DLL_API SqlRequest {
 public:
     SqlRequest(const std::string& str);
     SqlRequest();
     ~SqlRequest();
-    SqlRequest(const SqlRequest&)               = delete;
-    SqlRequest(SqlRequest&&)                    = delete;
-    SqlRequest& operator = (const SqlRequest&)  = delete;
-    SqlRequest& operator = (SqlRequest&&)       = delete;
+    SqlRequest(const SqlRequest&) = delete;
+    SqlRequest(SqlRequest&&) = delete;
+    SqlRequest& operator = (const SqlRequest&) = delete;
+    SqlRequest& operator = (SqlRequest&&) = delete;
 
     SqlRequest& operator <<(const std::string& sqlRequest);
     SqlRequest& operator <<(const long long sqlRequest);
 
     void clear();
     std::string str() const;
+    size_t getLength() const;
+    std::vector<SqlRequest> split(const char* separator) const;
 
 private:
     std::stringstream str_;
@@ -48,16 +51,15 @@ std::string DLL_API dbJoin(const std::vector<long long>& srcList);
 
 std::string DLL_API dbJoin(const std::vector<std::string>& srcList);
 
-class DLL_API DataBase
-{
+class DLL_API DataBase {
 public:
     DataBase();
     ~DataBase();
 
-    DataBase(const DataBase &)                  = delete;
-    DataBase(DataBase &&)                       = delete;
-    DataBase& operator = (const DataBase &)     = delete;
-    DataBase& operator = (DataBase &&)          = delete;
+    DataBase(const DataBase&) = delete;
+    DataBase(DataBase&&) = delete;
+    DataBase& operator = (const DataBase&) = delete;
+    DataBase& operator = (DataBase&&) = delete;
 
     /* 数据库初始化
         * ip:数据库服务器ip
@@ -83,35 +85,53 @@ public:
         */
     std::string getDbUid() const;
 
-    /* 查询数据库数据
+    DataRecords execSql(const SqlRequest& sqlRequest, const char* separator = nullptr);
+
+    /* 查询数据表数据
         * sqlRequest sql请求
         * return 查找结果
         */
     std::vector<std::vector<std::string>> selectDbInfo(const SqlRequest& sqlRequest);
 
-    /* 插入数据库数据
+    /* 插入数据表数据
         * sqlRequest sql请求
         * return 插入成功与否
         */
     BOOL insertDbInfo(const SqlRequest& sqlRequest);
 
-    /* 更新数据库数据
+    /* 更新数据表数据
         * sqlRequest sql请求
         * return 更新成功与否
         */
     BOOL updateDbInfo(const SqlRequest& sqlRequest);
 
-    /* 删除数据库数据
+    /* 删除数据表数据
         * sqlRequest sql请求
         * return 删除成功与否
         */
     BOOL delDbInfo(const SqlRequest& sqlRequest);
 
-    /* 删除数据库数据
+    /* 创建数据表
+        * sqlRequest sql请求
+        * return 创建成功与否
+        */
+    BOOL createDbInfo(const SqlRequest& sqlRequest);
+
+    /* 删除数据表
         * sqlRequest sql请求
         * return 删除成功与否
         */
+    BOOL dropDbInfo(const SqlRequest& sqlRequest);
+
+    /* 数据库反初始化
+        * return 反初始化成功与否
+        */
     BOOL uninitDataBase();
+
+    /* 获取数据库失败操作信息
+        * return 错误信息
+        */
+    std::string getErrMessage() const;
 };
 
 #endif // !MY_DATA_BASE_H

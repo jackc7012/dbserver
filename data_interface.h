@@ -8,6 +8,8 @@
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF", "adoEOF")
 
 enum class DBTYPE {
+    CREATETABLE,
+    DROPTABLE,
     INSERT,
     DEL,
     MODIFY,
@@ -15,8 +17,7 @@ enum class DBTYPE {
 };
 
 namespace cwy {
-    class DataBaseImpl
-    {
+    class DataBaseImpl {
     public:
         static DataBaseImpl* createInstance();
 
@@ -30,16 +31,24 @@ namespace cwy {
 
         BOOL uninitDataBase();
 
-        std::string getDbName() const {
+        std::string getDbName() const
+        {
             return dataBaseName_;
         }
 
-        std::string getServerIp() const {
+        std::string getServerIp() const
+        {
             return dataBaseIp_;
         }
 
-        std::string getDbUid() const {
+        std::string getDbUid() const
+        {
             return dataBaseUid_;
+        }
+
+        std::string getErrMessage() const
+        {
+            return errMessage_;
         }
 
     private:
@@ -48,10 +57,10 @@ namespace cwy {
     private:
         DataBaseImpl();
 
-        DataBaseImpl(const DataBaseImpl&)           = delete;
-        DataBaseImpl(DataBaseImpl&&)                = delete;
+        DataBaseImpl(const DataBaseImpl&) = delete;
+        DataBaseImpl(DataBaseImpl&&) = delete;
         DataBaseImpl operator=(const DataBaseImpl&) = delete;
-        DataBaseImpl operator=(DataBaseImpl&&)      = delete;
+        DataBaseImpl operator=(DataBaseImpl&&) = delete;
 
     private:
         _ConnectionPtr pMyConnect{ nullptr };
@@ -59,6 +68,7 @@ namespace cwy {
         std::string dataBaseName_;
         std::string dataBaseIp_;
         std::string dataBaseUid_;
+        std::string errMessage_;
     };
 }
 
